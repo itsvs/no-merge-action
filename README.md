@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check for @nocommit
-      uses: itsvs/no-commit-action@releases/v2
+      uses: itsvs/no-merge-action@releases/v0.2
       with:
         github-token: ${{github.token}}
         keyword: "@nocommit"
