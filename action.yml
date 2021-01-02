@@ -1,11 +1,15 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Block PR Merges if Keyword Found'
+description: "Checks that the added code in a PR doesn't contain a keyword"
+author: 'itsvs'
+branding:
+  icon: 'git-pull-request'
+  color: 'gray-dark'
 inputs:
-  milliseconds: # change this
-    required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  github-token:
+    description: 'Github token, added magically'
+  keyword:
+    description: 'Word that must not be contained in the PR code'
+    
 runs:
   using: 'node12'
-  main: 'dist/index.js'
+  main: 'lib/main.js'

@@ -1,16 +1,33 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+const {GitHub, context} = require('@actions/github')
+const parse = require('parse-diff')
 
-async function run(): Promise<void> {
+async function run() {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
+    const token = core.getInput('github-token', {required: true})
+    const github = new GitHub(token, {})
+    const keyword = core.getInput('keyword')
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const diff_url = context.payload.pull_request.diff_url
+    const result = await github.request(diff_url)
+    const files = parse(result.data)
+    core.exportVariable('files', files)
+    core.setOutput('files', files)
 
-    core.setOutput('time', new Date().toTimeString())
+    let changes = ''
+    for (const file of files) {
+      for (const chunk of file.chunks) {
+        for (const change of chunk.changes) {
+          if (change.add) {
+            changes += change.content
+          }
+        }
+      }
+    }
+
+    if (changes.indexOf(keyword) >= 0) {
+      core.setFailed(`The code contains ${keyword}`)
+    }
   } catch (error) {
     core.setFailed(error.message)
   }
